@@ -14,7 +14,6 @@ uses
   XPTheme in 'XPTheme.pas',
   Windows,
   Messages,
-  VCL.Dialogs,
   SysUtils,
   Compress in 'Compress.pas',
   LZMADecompSmall in 'LZMADecompSmall.pas',
@@ -127,11 +126,9 @@ end;
 function SetupLdrWndProc(Wnd: HWND; Msg: UINT; WParam: WPARAM; LParam: LPARAM): LRESULT;
 stdcall;
 begin
-  ShowMessage('SetupLdrWndProc');
   Result := 0;
   case Msg of
     WM_QUERYENDSESSION: begin
-         ShowMessage('SetupLdrWndProc - WM_QUERYENDSESSION');
         { Return zero so that a shutdown attempt can't kill SetupLdr }
       end;
     WM_USER + 150: begin
@@ -154,7 +151,6 @@ var
   Msg: TMsg;
 begin
   while PeekMessage(Msg, 0, 0, 0, PM_REMOVE) do begin
-    if (msg.message = WM_CLOSE) or (msg.message = WM_DESTROY) or (msg.message = WM_QUIT) then ShowMessage('WM_CLOSEP');
     TranslateMessage(Msg);
     DispatchMessage(Msg);
   end;
@@ -366,7 +362,7 @@ begin
     RunImageLocally(HInstance);
 
     ProcessCommandLine;
-    
+
     if InitShowHelp then begin
       ShowHelp;
       Halt(0);
@@ -378,7 +374,7 @@ begin
       OffsetTable := GetSetupLdrOffsetTable;
       { Note: We don't check the OffsetTable.ID here because it would put a
         copy of the ID in the data section, and that would confuse external
-        programs that search for the offset table by ID. } 
+        programs that search for the offset table by ID. }
       if (OffsetTable.Version <> SetupLdrOffsetTableVersion) or
          (GetCRC32(OffsetTable^, SizeOf(OffsetTable^) - SizeOf(OffsetTable.TableCRC)) <> OffsetTable.TableCRC) or
          ((SourceF.Size.Hi = 0) and (SourceF.Size.Lo < OffsetTable.TotalSize)) then
@@ -479,7 +475,7 @@ begin
         SelfFilename + '" ' + GetCmdTail, SetupLdrExitCode);
 
       { Synchronize our active language with Setup's, in case we need to
-        display any messages below } 
+        display any messages below }
       if PendingNewLanguage <> -1 then
         SetActiveLanguage(PendingNewLanguage);
     finally
