@@ -14,6 +14,7 @@ uses
   XPTheme in 'XPTheme.pas',
   Windows,
   Messages,
+  VCL.Dialogs,
   SysUtils,
   Compress in 'Compress.pas',
   LZMADecompSmall in 'LZMADecompSmall.pas',
@@ -126,9 +127,11 @@ end;
 function SetupLdrWndProc(Wnd: HWND; Msg: UINT; WParam: WPARAM; LParam: LPARAM): LRESULT;
 stdcall;
 begin
+  ShowMessage('SetupLdrWndProc');
   Result := 0;
   case Msg of
     WM_QUERYENDSESSION: begin
+         ShowMessage('SetupLdrWndProc - WM_QUERYENDSESSION');
         { Return zero so that a shutdown attempt can't kill SetupLdr }
       end;
     WM_USER + 150: begin
@@ -151,6 +154,7 @@ var
   Msg: TMsg;
 begin
   while PeekMessage(Msg, 0, 0, 0, PM_REMOVE) do begin
+    if (msg.message = WM_CLOSE) or (msg.message = WM_DESTROY) or (msg.message = WM_QUIT) then ShowMessage('WM_CLOSEP');
     TranslateMessage(Msg);
     DispatchMessage(Msg);
   end;

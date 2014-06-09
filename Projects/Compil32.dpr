@@ -32,7 +32,9 @@ uses
   CompSignTools in 'CompSignTools.pas' {SignToolsForm},
   ScintInt in '..\Components\ScintInt.pas',
   ScintEdit in '..\Components\ScintEdit.pas',
-  ScintStylerInnoSetup in '..\Components\ScintStylerInnoSetup.pas';
+  ScintStylerInnoSetup in '..\Components\ScintStylerInnoSetup.pas',
+  NewStaticText in '..\Components\NewStaticText.pas',
+  NewTabSet in '..\Components\NewTabSet.pas';
 
 {$R *.res}
 {$R Compil32.manifest.res}

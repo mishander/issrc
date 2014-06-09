@@ -1,4 +1,8 @@
+*.hlp
 *.dcu
+*.cnt
+*.gid
+*.e32
 *.dll
 *.dproj.local
 *.exe

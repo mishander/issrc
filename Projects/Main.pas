@@ -3036,12 +3036,7 @@ begin
     SetupFile.Free;
   end;
 
-  { Show "Select Language" dialog if necessary }
-  if ShowLanguageDialog and (Entries[seLanguage].Count > 1) and
-     not InitSilent and not InitVerySilent then begin
-    if not AskForLanguage then
-      Abort;
-  end;
+
 
   { Check processor architecture }
   if (SetupHeader.ArchitecturesAllowed <> []) and
@@ -3145,6 +3140,12 @@ begin
   else
     NeedPassword := HandleInitPassword(NeedPassword);
 
+  { Show "Select Language" dialog if necessary }
+  if ShowLanguageDialog and (Entries[seLanguage].Count > 1) and
+     not InitSilent and not InitVerySilent then begin
+    if not AskForLanguage then
+      Abort;
+  end;
   { Expand AppName, AppVerName, and AppCopyright now since they're used often,
     especially by the background window painting. }
   ExpandedAppName := ExpandConst(SetupHeader.AppName);

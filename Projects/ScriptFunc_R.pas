@@ -26,7 +26,7 @@ uses
   {$IFNDEF Delphi3orHigher} Ole2, {$ELSE} ActiveX, {$ENDIF}
   Struct, ScriptDlg, Main, PathFunc, CmnFunc, CmnFunc2, FileClass, RedirFunc,
   Install, InstFunc, InstFnc2, Msgs, MsgIDs, BrowseFunc, Wizard, VerInfo,
-  SetupTypes, Int64Em, MD5, SHA1, Logging, SetupForm, RegDLL, Helper,
+  SetupTypes, Int64Em, MD5, SHA1, Logging, SetupForm, RegDLL, Helper,SelLangForm,
   SpawnClient, UninstProgressForm;
 
 var
@@ -93,6 +93,13 @@ begin
   if Result = nil then
     InternalError('An attempt was made to access WizardForm before it has been created'); 
 end;
+function GetSelLangForm: TSelectLanguageForm;
+begin
+  Result := SelectLanguageForm;
+  if Result = nil then
+    InternalError('An attempt was made to access SelectLanguageForm before it has been created');
+end;
+
 
 function GetUninstallProgressForm: TUninstallProgressForm;
 begin
@@ -956,6 +963,8 @@ begin
     Stack.SetClass(PStart, GetMainForm);
   end else if Proc.Name = 'ACTIVELANGUAGE' then begin
     Stack.SetString(PStart, ExpandConst('{language}'));
+  end else if Proc.Name = 'SELECTLANGUAGEFORM' then begin
+    Stack.SetClass(PStart, GetSelLangForm);
   end else if Proc.Name = 'ISCOMPONENTSELECTED' then begin
     if IsUninstaller then
       NoUninstallFuncError(Proc.Name);

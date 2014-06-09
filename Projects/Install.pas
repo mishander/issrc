@@ -193,7 +193,7 @@ function AbortRetryIgnoreMsgBox(const Text1, Text2: String): Boolean;
 { Returns True if Ignore was selected, False if Retry was selected, or
   calls Abort if Abort was selected. }
 begin
-  Result := False;
+ { Result := False;
   case LoggedMsgBox(Text1 + SNewLine2 + Text2, '', mbError, MB_ABORTRETRYIGNORE, True, IDABORT) of
     IDABORT: Abort;
     IDRETRY: ;
@@ -201,7 +201,27 @@ begin
   else
     Log('LoggedMsgBox returned an unexpected value. Assuming Abort.');
     Abort;
+  end;     }
+  Result := False;
+  if (CodeRunner <> nil) and CodeRunner.FunctionExists('ShowErrorPopup') then
+  begin
+    try
+     Result := CodeRunner.RunBooleanFunction('ShowErrorPopup', [Text1,Text2], False, True);
+    except
+      Log('InitializeLanguageDialog raised an exception.');
+      Application.HandleException(nil);
+    end;
   end;
+  if (Result = False) then
+  begin
+    Abort;
+  end
+  else
+  begin
+    Result := False;
+  end;
+
+
 end;
 
 function FileTimeToStr(const AFileTime: TFileTime): String;
@@ -3033,7 +3053,9 @@ begin
   end;
   AddAttributesToFile(DisableFsRedir, DestFile, CurFile^.Attribs);
 end;
+// returns file size in bytes or -1 if not found.
 
+   //MessageBox(HWND_MESSAGE,FileName,FileName,MB_OK);
 procedure ExtractTemporaryFile(const BaseName: String);
 
   function EscapeBraces(const S: String): String;

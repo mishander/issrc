@@ -19,9 +19,11 @@ uses
   Windows,
   SysUtils,
   Messages,
+  VCL.Dialogs,
   CmnFunc in 'CmnFunc.pas',
   CmnFunc2 in 'CmnFunc2.pas',
   Main in 'Main.pas' {MainForm},
+  SelLangForm in 'SelLangForm.pas' {MainForm},
   Install in 'Install.pas',
   Msgs in 'Msgs.pas',
   MsgIDs in 'MsgIDs.pas',
@@ -37,7 +39,6 @@ uses
   ScriptRunner in 'ScriptRunner.pas',
   ScriptDlg in 'ScriptDlg.pas',
   ScriptClasses_R in 'ScriptClasses_R.pas',
-  SelLangForm in 'SelLangForm.pas' {SelectLanguageForm},
   Extract in 'Extract.pas',
   Int64Em in 'Int64Em.pas',
   SelFolderForm in 'SelFolderForm.pas' {SelectFolderForm},
@@ -68,7 +69,10 @@ uses
   ResUpdate in 'ResUpdate.pas',
   SpawnCommon in 'SpawnCommon.pas',
   SpawnServer in 'SpawnServer.pas',
-  SpawnClient in 'SpawnClient.pas';
+  SpawnClient in 'SpawnClient.pas',
+  BidiCtrls in '..\Components\BidiCtrls.pas',
+  BidiUtils in '..\Components\BidiUtils.pas',
+  BitmapImage in '..\Components\BitmapImage.pas';
 
 {$R *.RES}
 {$IFDEF UNICODE}
@@ -106,6 +110,7 @@ type
 
 class function TDummyClass.AntiShutdownHook(var Message: TMessage): Boolean;
 begin
+ShowMessage('TDummyClass.AntiShutdownHook');
   { This causes Setup/Uninstall/RegSvr to all deny shutdown attempts.
     - If we were to return 1, Windows will send us a WM_ENDSESSION message and
       TApplication.WndProc will call Halt in response. This is no good because
@@ -189,9 +194,9 @@ var
 begin
   { Note: The documentation claims this function is only available in XP SP1,
     but it's actually available on stock XP too. }
-  Proc := GetProcAddress(GetModuleHandle(user32), 'DisableProcessWindowsGhosting');
-  if Assigned(Proc) then
-    Proc;
+  //Proc := GetProcAddress(GetModuleHandle(user32), 'DisableProcessWindowsGhosting');
+  //if Assigned(Proc) then
+  //  Proc;
 end;
 
 procedure SelectMode;
@@ -268,7 +273,7 @@ begin
   try
     SetErrorMode(SEM_FAILCRITICALERRORS);
     DisableWindowGhosting;
-    Application.HookMainWindow(TDummyClass.AntiShutdownHook);
+    //Application.HookMainWindow(TDummyClass.AntiShutdownHook);
     SelectMode;
   except
     { Halt on any exception }
@@ -286,11 +291,12 @@ begin
     is shown and hidden, the application window should still be visible. }
   ShowWindow(Application.Handle, SW_SHOW);
   Application.OnException := TMainForm.ShowException;
+  Application.OnMessage := SelectLanguageForm.AppMessage;
   try
     Application.Initialize;
     InitializeSetup;
     Application.CreateForm(TMainForm, MainForm);
-    MainForm.InitializeWizard;
+  MainForm.InitializeWizard;
   except
     { Halt on any exception }
     ShowExceptionMsg;

@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls;
+  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls,Logging;
 
 type
   TSelectLanguageForm = class(TSetupForm)
@@ -27,11 +27,16 @@ type
   private
     { Private declarations }
   public
+    procedure AppMessage(var Msg: TMsg; var Handled: Boolean);
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
   end;
 
+var
+  SelectLanguageForm: TSelectLanguageForm;
+
 function AskForLanguage: Boolean;
+
 
 implementation
 
@@ -43,6 +48,19 @@ uses
 var
   DefComboWndProcW, PrevComboWndProc: Pointer;
 
+
+procedure TSelectLanguageForm.AppMessage(var Msg: TMsg; var Handled: Boolean);
+var msgStr: String;
+begin
+  Handled := False;
+  if (Msg.message = WM_SYSCOMMAND) and (msg.wParam = SC_CLOSE) then
+  begin
+    SelectLanguageForm.CancelButton.Click;
+    Handled := true;
+  end;
+  { For all other messages, Handled remains False }
+  { so that other message handlers can respond. }
+end;
 function NewComboWndProc(Wnd: HWND; Msg: UINT; wParam: WPARAM; lParam: LPARAM): LRESULT;
 stdcall;
 begin
@@ -62,7 +80,6 @@ function AskForLanguage: Boolean;
 { Creates and shows the "Select Language" dialog. Returns True and activates
   the selected language if the user clicks OK, or False otherwise. }
 var
-  LangForm: TSelectLanguageForm;
   I, J: Integer;
   LangEntry: PSetupLanguageEntry;
 {$IFNDEF UNICODE}
@@ -71,7 +88,7 @@ var
 {$ENDIF}
   PrevLang: String;
 begin
-  LangForm := TSelectLanguageForm.Create(Application);
+  SelectLanguageForm := TSelectLanguageForm.Create(Application);
   try
 {$IFNDEF UNICODE}
     { On NT, make it possible to add Unicode strings to our ANSI combo box by
@@ -90,8 +107,8 @@ begin
     for I := 0 to Entries[seLanguage].Count-1 do begin
       LangEntry := Entries[seLanguage][I];
 {$IFDEF UNICODE}
-      J := LangForm.LangCombo.Items.Add(LangEntry.LanguageName);
-      LangForm.LangCombo.Items.Objects[J] := TObject(I);
+      J := SelectLanguageForm.LangCombo.Items.Add(LangEntry.LanguageName);
+      SelectLanguageForm.LangCombo.Items.Objects[J] := TObject(I);
 {$ELSE}
       if (I = ActiveLanguage) or (LangEntry.LanguageCodePage = 0) or
          (LangEntry.LanguageCodePage = GetACP) or
@@ -111,14 +128,14 @@ begin
 
    { If there's multiple languages, select the previous language, if available }
     if (shUsePreviousLanguage in SetupHeader.Options) and
-       (LangForm.LangCombo.Items.Count > 1) then begin
+       (SelectLanguageForm.LangCombo.Items.Count > 1) then begin
       { do not localize or change the following string }
       PrevLang := GetPreviousData(ExpandConst(SetupHeader.AppId), 'Inno Setup: Language', '');
 
       if PrevLang <> '' then begin
         for I := 0 to Entries[seLanguage].Count-1 do begin
           if CompareText(PrevLang, PSetupLanguageEntry(Entries[seLanguage][I]).Name) = 0 then begin
-            LangForm.LangCombo.ItemIndex := LangForm.LangCombo.Items.IndexOfObject(TObject(I));
+            SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(I));
             Break;
           end;
         end;
@@ -126,15 +143,25 @@ begin
     end;
 
     { Select the active language if no previous language was selected }
-    if LangForm.LangCombo.ItemIndex = -1 then
-      LangForm.LangCombo.ItemIndex := LangForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
+    if SelectLanguageForm.LangCombo.ItemIndex = -1 then
+      SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
 
-    if LangForm.LangCombo.Items.Count > 1 then begin
-      Result := (LangForm.ShowModal = mrOK);
-      if Result then begin
-        I := LangForm.LangCombo.ItemIndex;
+    if SelectLanguageForm.LangCombo.Items.Count > 1 then
+    begin
+      if (CodeRunner <> nil) and CodeRunner.FunctionExists('InitializeLanguageDialog') then begin
+        try
+          CodeRunner.RunBooleanFunction('InitializeLanguageDialog', [''], False, True);
+        except
+          Log('InitializeLanguageDialog raised an exception.');
+          Application.HandleException(nil);
+        end;
+      end;
+      Result := (SelectLanguageForm.ShowModal = mrOK);
+      if Result then
+      begin
+        I := SelectLanguageForm.LangCombo.ItemIndex;
         if I >= 0 then
-          SetActiveLanguage(Integer(LangForm.LangCombo.Items.Objects[I]));
+          SetActiveLanguage(Integer(SelectLanguageForm.LangCombo.Items.Objects[I]));
       end;
     end
     else begin
@@ -144,7 +171,7 @@ begin
       Result := True;
     end;
   finally
-    LangForm.Free;
+    SelectLanguageForm.Free;
   end;
 end;
 
@@ -156,7 +183,6 @@ begin
 
   InitializeFont;
   Center;
-
   Caption := SetupMessages[msgSelectLanguageTitle];
   SelectLabel.Caption := SetupMessages[msgSelectLanguageLabel];
   OKButton.Caption := SetupMessages[msgButtonOK];

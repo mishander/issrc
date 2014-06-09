@@ -29,7 +29,7 @@ uses
   NewStaticText, NewCheckListBox, NewProgressBar, RichEditViewer,
   ExtCtrls, UIStateForm, SetupForm, Main, Wizard, SetupTypes, PasswordEdit,
   FolderTreeView, BitmapImage, NewNotebook, ScriptDlg, BidiCtrls,
-  UninstProgressForm;
+  UninstProgressForm,SelLangForm;
 
 type
   TWinControlAccess = class(TWinControl);
@@ -203,6 +203,23 @@ begin
   with CL.Add(TMainForm) do
   begin
     RegisterMethod(@TMainForm.ShowAboutBox, 'ShowAboutBox');
+  end;
+end;
+
+procedure TSelectLanguageOKButton_R(Self: TSelectLanguageForm; var T: TNewButton); begin T := Self.OKButton; end;
+procedure TSelectLanguageCancelButton_R(Self: TSelectLanguageForm; var T: TNewButton); begin T := Self.CancelButton; end;
+procedure TSelectLanguageSelectLabel_R(Self: TSelectLanguageForm; var T: TNewStaticText); begin T := Self.SelectLabel; end;
+procedure TSelectLanguageLangCombo_R(Self: TSelectLanguageForm; var T: TNewComboBox); begin T := Self.LangCombo; end;
+
+
+procedure RegisterSelectLanguageForm_R(Cl: TPSRuntimeClassImporter);
+begin
+  with Cl.Add(TSelectLanguageForm) do
+  begin
+    RegisterPropertyHelper(@TSelectLanguageOKButton_R, nil, 'OKButton');
+    RegisterPropertyHelper(@TSelectLanguageCancelButton_R, nil, 'CancelButton');
+    RegisterPropertyHelper(@TSelectLanguageSelectLabel_R, nil, 'SelectLabel');
+    RegisterPropertyHelper(@TSelectLanguageLangCombo_R, nil, 'LangCombo');
   end;
 end;
 
@@ -665,6 +682,7 @@ begin
     RegisterMainForm_R(Cl);
     RegisterWizardForm_R(Cl);
     RegisterUninstallProgressForm_R(Cl);
+    RegisterSelectLanguageForm_R(Cl);
 
     RegisterWizardPage_R(Cl);
     RegisterInputQueryWizardPage_R(Cl);

@@ -234,6 +234,7 @@ begin
     RegisterProperty('Stretch', 'Boolean', iptrw);
     RegisterProperty('OnClick', 'TNotifyEvent', iptrw);
     RegisterProperty('OnDblClick', 'TNotifyEvent', iptrw);
+    RegisterProperty('OnMouseDown', 'TMouseEvent', iptrw);
   end;
 end;
 
@@ -293,6 +294,20 @@ begin
   with CL.AddClassN(CL.FindClass('TSetupForm'), 'TMainForm') do
   begin
     RegisterMethod('Procedure ShowAboutBox');
+  end;
+end;
+
+procedure RegisterSelectLanguageForm_C(Cl: TPSPascalCompiler);
+var
+  NewClass: TPSCompileTimeClass;
+begin
+  with Cl.AddClassN(Cl.FindClass('TSetupForm'), 'TSelectLanguageForm') do
+  begin
+    RegisterProperty('CancelButton', 'TNewButton', iptr);
+    RegisterProperty('OKButton', 'TNewButton', iptr);
+    RegisterProperty('LangCombo', 'TNewComboBox', iptr);
+    RegisterProperty('IconBitmapImage', 'TBitmapImage', iptr);
+    RegisterProperty('SelectLabel', 'TNewStaticText', iptr);
   end;
 end;
 
@@ -616,6 +631,7 @@ begin
   RegisterSetupForm_C(Cl);
   RegisterMainForm_C(Cl);
   RegisterWizardForm_C(Cl);
+  RegisterSelectLanguageForm_C(Cl);
   RegisterUninstallProgressForm_C(Cl);
 
   RegisterWizardPage_C(Cl);
