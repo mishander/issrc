@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls,Logging;
+  SetupForm, StdCtrls, ExtCtrls, NewStaticText, BitmapImage, BidiCtrls,Logging,ImgList, VCL.ComCtrls;
 
 type
   TSelectLanguageForm = class(TSetupForm)
@@ -28,8 +28,11 @@ type
     { Private declarations }
   public
     procedure AppMessage(var Msg: TMsg; var Handled: Boolean);
+   // procedure ColorComboDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
+   // property OnDrawItem: TDrawItemEvent read GetDrawItem write SetDrawItem;
     { Public declarations }
     constructor Create(AOwner: TComponent); override;
+
   end;
 
 var
@@ -40,14 +43,30 @@ function AskForLanguage: Boolean;
 
 implementation
 
+
 uses
   Struct, Msgs, MsgIDs, Main;
 
 {$R *.DFM}
 
+const Colors: array[0..4] of TColor = (clAqua, clBlack, clRed, clWhite, clYellow) ;
+
 var
   DefComboWndProcW, PrevComboWndProc: Pointer;
 
+
+{
+procedure TSelectLanguageForm.ColorComboDrawItem(Control: TWinControl; Index: Integer; Rect: TRect; State: TOwnerDrawState);
+begin
+  with Control as TComboBox do
+  begin
+    //draw filled rectangle
+    Canvas.Brush.Color := TColor(Colors[Index mod 5]) ;
+    Canvas.FillRect(Rect) ;
+    //draw color name
+    Canvas.TextOut(Rect.Left+5, Rect.Top, ColorToString(Colors[Index]));
+  end;
+end;  }
 
 procedure TSelectLanguageForm.AppMessage(var Msg: TMsg; var Handled: Boolean);
 var msgStr: String;
@@ -58,8 +77,6 @@ begin
     SelectLanguageForm.CancelButton.Click;
     Handled := true;
   end;
-  { For all other messages, Handled remains False }
-  { so that other message handlers can respond. }
 end;
 function NewComboWndProc(Wnd: HWND; Msg: UINT; wParam: WPARAM; lParam: LPARAM): LRESULT;
 stdcall;
@@ -146,6 +163,11 @@ begin
     if SelectLanguageForm.LangCombo.ItemIndex = -1 then
       SelectLanguageForm.LangCombo.ItemIndex := SelectLanguageForm.LangCombo.Items.IndexOfObject(TObject(ActiveLanguage));
 
+   // for i := 0 to TWinControl(SelectLanguageForm).ControlCount-1 do
+  //  if( TWinControl(SelectLanguageForm).Controls[i].ClassName = 'TNewComboBox' )     then
+  //  TNewComboBox(TWinControl(SelectLanguageForm).Controls[i]).OnDrawItem := SelectLanguageForm.ColorComboDrawItem;
+
+
     if SelectLanguageForm.LangCombo.Items.Count > 1 then
     begin
       if (CodeRunner <> nil) and CodeRunner.FunctionExists('InitializeLanguageDialog') then begin
@@ -175,9 +197,8 @@ begin
   end;
 end;
 
-{ TSelectLanguageForm }
-
 constructor TSelectLanguageForm.Create(AOwner: TComponent);
+var i:integer;
 begin
   inherited;
 
@@ -187,7 +208,9 @@ begin
   SelectLabel.Caption := SetupMessages[msgSelectLanguageLabel];
   OKButton.Caption := SetupMessages[msgButtonOK];
   CancelButton.Caption := SetupMessages[msgButtonCancel];
-
+  LangCombo.Style := csDropDownList;
+  //LangCombo.OnDrawItem := @TSelectLanguageForm.ColorComboDrawItem;
+  //LangCombo.OnMeasureItem := @TSelectLanguageForm.LangComboMeasureItem;
   IconBitmapImage.Bitmap.Canvas.Brush.Color := Color;
   IconBitmapImage.Bitmap.Width := Application.Icon.Width;
   IconBitmapImage.Bitmap.Height := Application.Icon.Height;

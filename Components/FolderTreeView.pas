@@ -676,7 +676,7 @@ begin
             TVItem.hItem := DispItem.hItem;
             TVItem.pszText := PChar(S);
             TreeView_SetItem(Handle, TVItem);
-            TreeView_SortChildren(Handle, TreeView_GetParent(Handle, DispItem.hItem), 0);
+            TreeView_SortChildren(Handle, TreeView_GetParent(Handle, DispItem.hItem), false);
             Change;
           end;
         end;
@@ -1033,7 +1033,7 @@ begin
     if Result then begin
       { When a text callback is used, sorting after all items are inserted is
         exponentially faster than using hInsertAfter=TVI_SORT }
-      TreeView_SortChildren(Handle, Item, 0);
+      TreeView_SortChildren(Handle, Item, false);
     end;
   end;
 end;
@@ -1171,7 +1171,7 @@ begin
       AddSubfolders(Item, AddBackslash(FCommonPrograms) + Path, FCommonStartup);
     if FUserPrograms <> '' then
       AddSubfolders(Item, AddBackslash(FUserPrograms) + Path, FUserStartup);
-    TreeView_SortChildren(Handle, Item, 0);
+    TreeView_SortChildren(Handle, Item, false);
   end;
 end;
 

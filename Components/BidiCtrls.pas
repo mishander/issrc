@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, SysUtils, Messages, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls;
+  StdCtrls,VCL.ComCtrls;
 
 type
   TNewEdit = class(TEdit)
@@ -29,6 +29,12 @@ type
   end;
 
   TNewComboBox = class(TComboBox)
+  protected
+    procedure CreateParams(var Params: TCreateParams); override;
+   // procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState);override;
+  end;
+
+  TNewComboBoxEx = class(TComboBoxEx)
   protected
     procedure CreateParams(var Params: TCreateParams); override;
   end;
@@ -62,7 +68,7 @@ uses
 
 procedure Register;
 begin
-  RegisterComponents('JR', [TNewEdit, TNewMemo, TNewComboBox, TNewListBox,
+  RegisterComponents('JR', [TNewEdit, TNewMemo, TNewComboBox,TNewComboBoxEx, TNewListBox,
     TNewButton, TNewCheckBox, TNewRadioButton]);
 end;
 
@@ -85,6 +91,39 @@ end;
 { TNewComboBox }
 
 procedure TNewComboBox.CreateParams(var Params: TCreateParams);
+begin
+  inherited;
+  SetBiDiStyles(Self, Params);
+end;
+{
+procedure TNewComboBox.DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState);
+var tgf:TBitMap;
+begin
+  Rect.Left := Rect.Left + 5;
+  if (odSelected in State) then
+  Canvas.Brush.Color := clBlack
+ else
+  Canvas.Brush.Color := clWhite;
+ Canvas.FillRect(Rect);
+
+  if (odSelected in State) then
+  Canvas.Font.Color := clWhite
+ else
+  Canvas.Font.Color := clBlack;
+
+ Canvas.Font.Name := 'Arial';
+ Canvas.Font.Size := -13;
+
+ tgf := TBitMap.Create;
+ tgf.LoadFromFile('D:\\Flags\\lang-ru.bmp');
+ Canvas.Draw(Rect.Left,Rect.Top,tgf);
+
+ Canvas.TextOut(Rect.Left+25, Rect.Top, Items[Index]);
+ //inherited;
+end;           }
+{ TNewComboBox }
+
+procedure TNewComboBoxEx.CreateParams(var Params: TCreateParams);
 begin
   inherited;
   SetBiDiStyles(Self, Params);

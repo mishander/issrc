@@ -243,6 +243,7 @@ begin
   Cl.AddClassN(Cl.FindClass('TEdit'), 'TNewEdit');
   Cl.AddClassN(Cl.FindClass('TMemo'), 'TNewMemo');
   Cl.AddClassN(Cl.FindClass('TComboBox'), 'TNewComboBox');
+ // Cl.AddClassN(Cl.FindClass('TComboBoxEx'), 'TNewComboBoxEx');
   Cl.AddClassN(Cl.FindClass('TListBox'), 'TNewListBox');
   Cl.AddClassN(Cl.FindClass('TButton'), 'TNewButton');
   Cl.AddClassN(Cl.FindClass('TCheckBox'), 'TNewCheckBox');
@@ -596,6 +597,7 @@ begin
   SIRegisterTMemo(Cl);
   SIRegisterTCustomComboBox(Cl);
   SIRegisterTComboBox(Cl);
+  //SIRegisterTComboBoxEx(Cl);
   SIRegisterTButtonControl(Cl);
   SIRegisterTButton(Cl);
   SIRegisterTCustomCheckBox(Cl);
