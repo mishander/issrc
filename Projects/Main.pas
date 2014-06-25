@@ -2326,13 +2326,26 @@ end;
 
 function LoggedAppMessageBox(const Text, Caption: PChar; const Flags: Longint;
   const Suppressible: Boolean; const Default: Integer): Integer;
+var BResult:Boolean;
 begin
   if InitSuppressMsgBoxes and Suppressible then begin
     LogSuppressedMessageBox(Text, Flags, Default);
     Result := Default;
   end else begin
     LogMessageBox(Text, Flags);
-    Result := AppMessageBox(Text, Caption, Flags);
+    if (CodeRunner <> nil) and CodeRunner.FunctionExists('ShowPopup') then
+    begin
+        try
+         BResult := CodeRunner.RunBooleanFunction('ShowPopup', [StrPas(Text),StrPas(Caption),Flags], False, True);
+        except
+          Log('InitializeLanguageDialog raised an exception.');
+          Application.HandleException(nil);
+    end;
+    end;
+    if (BResult) then
+    Result := IDYES
+    else
+    Result := IDNO;
     if Result <> 0 then
       LogFmt('User chose %s.', [GetMessageBoxResultText(Result)])
     else

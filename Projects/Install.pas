@@ -203,10 +203,10 @@ begin
     Abort;
   end;     }
   Result := False;
-  if (CodeRunner <> nil) and CodeRunner.FunctionExists('ShowErrorPopup') then
+  if (CodeRunner <> nil) and CodeRunner.FunctionExists('ShowPopup') then
   begin
     try
-     Result := CodeRunner.RunBooleanFunction('ShowErrorPopup', [Text1,Text2], False, True);
+     Result := CodeRunner.RunBooleanFunction('ShowPopup', [Text1,Text2,MB_ABORTRETRYIGNORE], False, True);
     except
       Log('InitializeLanguageDialog raised an exception.');
       Application.HandleException(nil);

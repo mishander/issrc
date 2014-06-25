@@ -7273,7 +7273,7 @@ begin
     CodeCompiler.AddExport('RegisterExtraCloseApplicationsResources', '0', False, '', 0);
     CodeCompiler.AddExport('CurInstallProgressChanged', '0 @LongInt @LongInt', False, '', 0);
     CodeCompiler.AddExport('InitializeLanguageDialog', 'Boolean', False, '', 0);
-    CodeCompiler.AddExport('ShowErrorPopup', 'Boolean @String @String', False, '', 0);
+    CodeCompiler.AddExport('ShowPopup', 'Boolean @String @String @LongInt', False, '', 0);
 
     CodeCompiler.AddExport('InitializeUninstall', 'Boolean', False, '', 0);
     CodeCompiler.AddExport('DeinitializeUninstall', '0', False, '', 0);
