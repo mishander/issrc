@@ -71,7 +71,9 @@ uses
   SpawnClient in 'SpawnClient.pas',
   BidiCtrls in '..\Components\BidiCtrls.pas',
   BidiUtils in '..\Components\BidiUtils.pas',
-  BitmapImage in '..\Components\BitmapImage.pas';
+  BitmapImage in '..\Components\BitmapImage.pas',
+  Vcl.Themes,
+  Vcl.Styles;
 
 {$R *.RES}
 {$IFDEF UNICODE}
@@ -80,7 +82,8 @@ uses
 {$R SetupVersion.res}
 {$ENDIF}
 {$R IMAGES.RES}
-
+var
+  AppMsg : TMessageEvent;
 {$I VERSION.INC}
 
 procedure ShowExceptionMsg;
@@ -282,6 +285,7 @@ begin
   { Initialize.
     Note: There's no need to localize the following line since it's changed in
     InitializeSetup }
+  TStyleManager.TrySetStyle('Aqua Graphite');
   Application.Title := 'Setup';
   { On Delphi 3+, the application window by default isn't visible until a form
     is shown. Force it visible like Delphi 2. Note that due to the way
@@ -289,12 +293,15 @@ begin
     is shown and hidden, the application window should still be visible. }
   ShowWindow(Application.Handle, SW_SHOW);
   Application.OnException := TMainForm.ShowException;
+  AppMsg := Application.OnMessage;
   Application.OnMessage := SelectLanguageForm.AppMessage;
   try
     Application.Initialize;
     InitializeSetup;
     Application.CreateForm(TMainForm, MainForm);
   MainForm.InitializeWizard;
+
+  Application.OnMessage := AppMsg;
   except
     { Halt on any exception }
     ShowExceptionMsg;
