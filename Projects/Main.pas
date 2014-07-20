@@ -3604,7 +3604,7 @@ begin
 {$IFDEF UNICODE}
   StringChangeEx(S, '(C)', #$00A9, True);
 {$ENDIF}
-  LoggedAppMessageBox(PChar('msgbox_About'), PChar('msgbox_About'),  MB_OK or MB_ICONSTOP, True, IDOK);
+  LoggedMsgBox(S, SetupMessages[msgAboutSetupTitle], mbInformation, MB_OK, False, 0);
 end;
 
 class procedure TMainForm.ShowExceptionMsg(const S: String);
